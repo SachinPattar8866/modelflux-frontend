@@ -3,10 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-
-function ChatPagePlaceholder() {
-  return <div className="p-8">Chat page coming next</div>;
-}
+import ChatPage from './pages/ChatPage';
 
 export default function App() {
   return (
@@ -19,7 +16,7 @@ export default function App() {
             path="/chat"
             element={
               <ProtectedRoute>
-                <ChatPagePlaceholder />
+                <ChatPage />
               </ProtectedRoute>
             }
           />
