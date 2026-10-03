@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { connectChatSocket, sendChatMessage, disconnectChatSocket } from '../websocket/chatSocket';
+import { getConversationMessages } from '../api/chatApi';
 
 export function useChat() {
   const { token } = useAuth();
@@ -23,11 +24,8 @@ export function useChat() {
 
         if (chunk.switching) {
           setSwitchingMessage(chunk.token);
-          streamingReplyRef.current = ''; // discard partial output, matches backend behavior
-          setMessages((prev) => {
-            const withoutPartial = prev.filter((m) => !m.isStreamingPlaceholder);
-            return withoutPartial;
-          });
+          streamingReplyRef.current = '';
+          setMessages((prev) => prev.filter((m) => !m.isStreamingPlaceholder));
           return;
         }
 
@@ -35,6 +33,13 @@ export function useChat() {
           setIsStreaming(false);
           setSwitchingMessage(null);
           streamingReplyRef.current = '';
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.isStreamingPlaceholder
+                ? { ...m, isStreamingPlaceholder: false, providerUsed: chunk.providerUsed }
+                : m
+            )
+          );
           return;
         }
 
@@ -71,5 +76,31 @@ export function useChat() {
     [conversationId]
   );
 
-  return { messages, sendMessage, isStreaming, isConnected, switchingMessage, conversationId };
+  const loadConversation = useCallback(async (id) => {
+    const history = await getConversationMessages(id);
+    setConversationId(id);
+    setMessages(
+      history.map((m) => ({
+        role: m.role,
+        content: m.content,
+        providerUsed: m.providerUsed,
+      }))
+    );
+  }, []);
+
+  const startNewChat = useCallback(() => {
+    setConversationId(null);
+    setMessages([]);
+  }, []);
+
+  return {
+    messages,
+    sendMessage,
+    isStreaming,
+    isConnected,
+    switchingMessage,
+    conversationId,
+    loadConversation,
+    startNewChat,
+  };
 }
