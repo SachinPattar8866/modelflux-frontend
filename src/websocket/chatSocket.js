@@ -34,6 +34,15 @@ export function sendChatMessage(conversationId, message, preferredProvider) {
   });
 }
 
+// NEW: Send abort signal to the backend
+export function stopChatMessage(conversationId) {
+  if (!stompClient || !stompClient.connected) return;
+  stompClient.publish({
+    destination: '/app/chat/stop',
+    body: JSON.stringify({ conversationId }),
+  });
+}
+
 export function disconnectChatSocket() {
   if (stompClient) {
     stompClient.deactivate();

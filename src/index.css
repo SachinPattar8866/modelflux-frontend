@@ -1,1 +1,47 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --color-accent: var(--color-accent-base);
+  --color-accent-wash: var(--color-accent-wash-base);
+  --color-canvas: var(--color-canvas-base);
+  --color-sidebar: var(--color-sidebar-base);
+  --color-ink: var(--color-ink-base);
+  --color-ink-soft: var(--color-ink-soft-base);
+  --color-muted: var(--color-muted-base);
+  --color-line: var(--color-line-base);
+
+  --color-ok: #16a34a;
+  --color-warn: #d97706;
+  --color-down: #dc2626;
+}
+
+/* Light Mode (Default) */
+:root {
+  --color-accent-base: #6d56f0;
+  --color-accent-wash-base: #efecfd;
+  --color-canvas-base: #fafafa;
+  --color-sidebar-base: #f5f5f3;
+  --color-ink-base: #1c1c1a;
+  --color-ink-soft-base: #44443e;
+  --color-muted-base: #8a8a82;
+  --color-line-base: #e6e5e1;
+}
+
+/* Dark Mode Overrides */
+.dark {
+  --color-accent-base: #816bf5;
+  --color-accent-wash-base: #2a2454;
+  --color-canvas-base: #121212;
+  --color-sidebar-base: #1a1a1a;
+  --color-ink-base: #f5f5f5;
+  --color-ink-soft-base: #a3a3a3;
+  --color-muted-base: #737373;
+  --color-line-base: #333333;
+}
+
+body {
+  @apply bg-canvas font-sans text-ink antialiased;
+}

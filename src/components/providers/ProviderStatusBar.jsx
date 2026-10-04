@@ -1,34 +1,27 @@
-import { useEffect, useState } from 'react';
-import { getProviderStatus } from '../../api/providerApi';
+import { STATUS_DOT, STATUS_LABEL, displayName } from './providerMeta';
 
-const STATUS_COLORS = {
-  ACTIVE: 'bg-green-100 text-green-700',
-  RATE_LIMITED: 'bg-yellow-100 text-yellow-700',
-  DOWN: 'bg-red-100 text-red-700',
-};
+function tooltip(s) {
+  if (s.status === 'RATE_LIMITED' && s.resetInSeconds) {
+    return `Rate limited. Resets in ${s.resetInSeconds}s`;
+  }
+  return STATUS_LABEL[s.status] ?? s.status;
+}
 
-export default function ProviderStatusBar() {
-  const [statuses, setStatuses] = useState([]);
-
-  useEffect(() => {
-    const fetchStatus = () => {
-      getProviderStatus().then(setStatuses).catch(console.error);
-    };
-
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 10000); // poll every 10s
-    return () => clearInterval(interval);
-  }, []);
-
+export default function ProviderStatusBar({ statuses }) {
   return (
-    <div className="flex gap-2 px-4 py-2 border-b bg-white">
+    // FIX: Added cursor-default and select-none to lock down the entire top bar
+    <div className="flex items-center gap-2 border-b border-line px-7 py-3.5 cursor-default select-none">
       {statuses.map((s) => (
         <span
           key={s.provider}
-          className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_COLORS[s.status]}`}
+          title={tooltip(s)}
+          className="flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1.5 text-[12.5px] font-semibold text-ink-soft"
         >
-          {s.provider}
-          {s.status === 'RATE_LIMITED' && s.resetInSeconds ? ` (${s.resetInSeconds}s)` : ''}
+          <span className={`size-1.5 rounded-full ${STATUS_DOT[s.status] ?? 'bg-muted'}`} />
+          {displayName(s.provider)}
+          {s.status === 'RATE_LIMITED' && s.resetInSeconds ? (
+            <span className="font-medium text-muted">{s.resetInSeconds}s</span>
+          ) : null}
         </span>
       ))}
     </div>

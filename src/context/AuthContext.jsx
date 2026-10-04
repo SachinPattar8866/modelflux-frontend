@@ -5,28 +5,34 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('jwt'));
+  const [email, setEmail] = useState(localStorage.getItem('email'));
 
-  const login = async (email, password) => {
-    const data = await loginApi(email, password);
+  const saveSession = (data, userEmail) => {
     localStorage.setItem('jwt', data.token);
+    localStorage.setItem('email', userEmail);
     setToken(data.token);
+    setEmail(userEmail);
   };
 
-  const register = async (email, password) => {
-    const data = await registerApi(email, password);
-    localStorage.setItem('jwt', data.token);
-    setToken(data.token);
+  const login = async (userEmail, password) => {
+    saveSession(await loginApi(userEmail, password), userEmail);
+  };
+
+  const register = async (userEmail, password) => {
+    saveSession(await registerApi(userEmail, password), userEmail);
   };
 
   const logout = () => {
     localStorage.removeItem('jwt');
+    localStorage.removeItem('email');
     setToken(null);
+    setEmail(null);
   };
 
   const isAuthenticated = !!token;
 
   return (
-    <AuthContext.Provider value={{ token, login, register, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ token, email, login, register, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
